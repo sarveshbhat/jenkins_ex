@@ -212,6 +212,8 @@ function makeResizable(element) {
                     element.style.width = Math.max(20, initialWidth + dx) + "px";
                     element.style.height = Math.max(20, initialHeight + dy) + "px";
                 }
+
+                updateBoundingBox();
             };
 
             document.onmouseup = function() {
@@ -229,9 +231,26 @@ function makeResizable(element) {
         boundingBox.style.height = `${element.offsetHeight}px`;
     }
 
+    // Dragging functionality for the whole shape (including the bounding box)
+    let offsetX, offsetY;
+    element.onmousedown = function(event) {
+        offsetX = event.clientX - element.offsetLeft;
+        offsetY = event.clientY - element.offsetTop;
+        document.onmousemove = function(event) {
+            element.style.left = event.clientX - offsetX + 'px';
+            element.style.top = event.clientY - offsetY + 'px';
+            updateBoundingBox();
+        };
+        document.onmouseup = function() {
+            document.onmousemove = null;
+            document.onmouseup = null;
+        };
+    };
+
     // Initial bounding box update
     updateBoundingBox();
 }
+
 
 
 updateGrid();
