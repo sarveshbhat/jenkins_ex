@@ -62,6 +62,18 @@
             width: 50px;
             height: 50px;
         }
+        .arrow {
+            position: absolute;
+            top: -10px;
+            left: calc(100% - 10px);
+            width: 10px;
+            height: 10px;
+            border-left: 2px solid black;
+            border-top: 2px solid black;
+            transform: rotate(45deg);
+            cursor: pointer;
+        }
+
         .red-circle { background: red; border-radius: 50%; }
         .green-circle { background: green; border-radius: 50%; }
         .black-outline { border: 3px solid black; border-radius: 50%; background: transparent; }
@@ -112,11 +124,11 @@
             const size = document.getElementById("gridSize").value;
             const grid = document.getElementById("gridContainer");
             grid.innerHTML = "";
-            
+
             // Update the grid's layout
             grid.style.gridTemplateColumns = `repeat(${size}, 40px)`;
             grid.style.gridTemplateRows = `repeat(${size}, 40px)`;
-            
+
             // Create grid cells
             for (let i = 0; i < size * size; i++) {
                 const cell = document.createElement("div");
@@ -135,7 +147,7 @@
         function zoomGrid(event) {
             gridScale += event.deltaY > 0 ? -0.1 : 0.1;
             gridScale = Math.max(0.5, Math.min(gridScale, 2)); // Limit scaling
-            
+
             // Apply scaling to grid and shapes
             updateGrid();
             event.preventDefault();
@@ -163,11 +175,11 @@
                     document.onmouseup = null;
                 };
             };
-            
+
             // Create the arrow on right-click
             element.oncontextmenu = function(event) {
                 event.preventDefault(); // Prevent the default right-click menu
-                
+
                 // Create and show the arrow in the top-right corner of the shape
                 const arrow = document.createElement("div");
                 arrow.classList.add("arrow");
@@ -189,13 +201,25 @@
                     let startY = e.clientY;
                     const initialWidth = element.offsetWidth;
                     const initialHeight = element.offsetHeight;
+                    const initialLeft = element.offsetLeft;
+                    const initialTop = element.offsetTop;
+
+                    // Adjust the shape's pivot to the bottom-left corner
+                    element.style.transformOrigin = "bottom left";
 
                     document.onmousemove = function(e) {
                         const deltaX = e.clientX - startX;
                         const deltaY = e.clientY - startY;
 
+                        // Adjust the size of the shape while pivoting from the bottom-left corner
                         element.style.width = Math.max(20, initialWidth + deltaX) + "px";
                         element.style.height = Math.max(20, initialHeight + deltaY) + "px";
+                        
+                        // Recalculate the position to maintain the bottom-left pivot
+                        const newLeft = initialLeft - deltaX;
+                        const newTop = initialTop + deltaY;
+                        element.style.left = newLeft + "px";
+                        element.style.top = newTop + "px";
                     };
 
                     document.onmouseup = function() {
@@ -208,6 +232,7 @@
         }
 
         updateGrid();
+
 
     </script>
 </body>
