@@ -107,74 +107,93 @@
 
     <script>
         let gridScale = 1;
-        function updateGrid() {
-            const size = document.getElementById("gridSize").value;
-            const grid = document.getElementById("gridContainer");
-            grid.innerHTML = "";
-            grid.style.gridTemplateColumns = `repeat(${size}, 40px)`;
-            grid.style.gridTemplateRows = `repeat(${size}, 40px)`;
-            
-            for (let i = 0; i < size * size; i++) {
-                const cell = document.createElement("div");
-                cell.classList.add("cell");
-                grid.appendChild(cell);
+
+            function updateGrid() {
+                const size = document.getElementById("gridSize").value;
+                const grid = document.getElementById("gridContainer");
+                grid.innerHTML = "";
+                
+                // Update the grid's layout
+                grid.style.gridTemplateColumns = `repeat(${size}, 40px)`;
+                grid.style.gridTemplateRows = `repeat(${size}, 40px)`;
+                
+                // Create grid cells
+                for (let i = 0; i < size * size; i++) {
+                    const cell = document.createElement("div");
+                    cell.classList.add("cell");
+                    grid.appendChild(cell);
+                }
+
+                // Scale the grid and shapes together
+                grid.style.transform = `scale(${gridScale})`;
+                const allShapes = document.querySelectorAll(".draggable");
+                allShapes.forEach(shape => {
+                    shape.style.transform = `scale(${gridScale})`;
+                });
             }
-        }
 
-        function zoomGrid(event) {
-            gridScale += event.deltaY > 0 ? -0.1 : 0.1;
-            gridScale = Math.max(0.5, Math.min(gridScale, 2));
-            document.getElementById("gridContainer").style.transform = `scale(${gridScale})`;
-            event.preventDefault();
-        }
+            function zoomGrid(event) {
+                gridScale += event.deltaY > 0 ? -0.1 : 0.1;
+                gridScale = Math.max(0.5, Math.min(gridScale, 2)); // Limit scaling
+                
+                // Apply scaling to grid and shapes
+                updateGrid();
+                event.preventDefault();
+            }
 
-        function addShape(type) {
-            const shape = document.createElement("div");
-            shape.classList.add("draggable", type);
-            document.body.appendChild(shape);
-            makeTransformable(shape);
-        }
+            function addShape(type) {
+                const shape = document.createElement("div");
+                shape.classList.add("draggable", type);
+                document.body.appendChild(shape);
+                makeTransformable(shape);
+                shape.style.transform = `scale(${gridScale})`;  // Apply the current grid scale
+            }
 
-        function makeTransformable(element) {
-            let offsetX, offsetY, startWidth, startHeight;
-            element.onmousedown = function(event) {
-                offsetX = event.clientX - element.offsetLeft;
-                offsetY = event.clientY - element.offsetTop;
-                document.onmousemove = function(event) {
-                    element.style.left = event.clientX - offsetX + 'px';
-                    element.style.top = event.clientY - offsetY + 'px';
-                    updateBoundingBox(element);
+            function makeTransformable(element) {
+                let offsetX, offsetY;
+                element.onmousedown = function(event) {
+                    offsetX = event.clientX - element.offsetLeft;
+                    offsetY = event.clientY - element.offsetTop;
+                    document.onmousemove = function(event) {
+                        element.style.left = event.clientX - offsetX + 'px';
+                        element.style.top = event.clientY - offsetY + 'px';
+                    };
+                    document.onmouseup = function() {
+                        document.onmousemove = null;
+                        document.onmouseup = null;
+                    };
                 };
-                document.onmouseup = function() {
-                    document.onmousemove = null;
-                    document.onmouseup = null;
-                };
-            };
-            
-            const boundingBox = document.createElement("div");
-            boundingBox.classList.add("bounding-box");
-            document.body.appendChild(boundingBox);
-            element.onclick = function() {
+                
+                const boundingBox = document.createElement("div");
+                boundingBox.classList.add("bounding-box");
+                document.body.appendChild(boundingBox);
                 boundingBox.style.display = "block";
-                updateBoundingBox(element);
-            };
-            
-            document.querySelectorAll(".resize-handle").forEach(handle => {
-                handle.onmousedown = function(event) {
-                    event.stopPropagation();
-                };
-            });
-        }
+                boundingBox.style.left = element.offsetLeft + 'px';
+                boundingBox.style.top = element.offsetTop + 'px';
+                boundingBox.style.width = element.offsetWidth + 'px';
+                boundingBox.style.height = element.offsetHeight + 'px';
+                
+                // Resize handles
+                ["handle-tl", "handle-tr", "handle-bl", "handle-br"].forEach(handleClass => {
+                    const handle = document.createElement("div");
+                    handle.classList.add("resize-handle", handleClass);
+                    boundingBox.appendChild(handle);
+                    handle.onmousedown = function(event) {
+                        event.stopPropagation();
+                        document.onmousemove = function(event) {
+                            element.style.width = Math.max(20, event.clientX - element.offsetLeft) + 'px';
+                            element.style.height = Math.max(20, event.clientY - element.offsetTop) + 'px';
+                        };
+                        document.onmouseup = function() {
+                            document.onmousemove = null;
+                            document.onmouseup = null;
+                        };
+                    };
+                });
+            }
 
-        function updateBoundingBox(element) {
-            const box = document.querySelector(".bounding-box");
-            box.style.left = element.offsetLeft + 'px';
-            box.style.top = element.offsetTop + 'px';
-            box.style.width = element.offsetWidth + 'px';
-            box.style.height = element.offsetHeight + 'px';
-        }
+            updateGrid();
 
-        updateGrid();
     </script>
 </body>
 </html>
