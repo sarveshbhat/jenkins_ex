@@ -83,6 +83,10 @@
         .handle-tr { top: -5px; right: -5px; cursor: nesw-resize; }
         .handle-bl { bottom: -5px; left: -5px; cursor: nesw-resize; }
         .handle-br { bottom: -5px; right: -5px; cursor: nwse-resize; }
+        .handle-tm { top: -5px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+        .handle-bm { bottom: -5px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+        .handle-ml { left: -5px; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
+        .handle-mr { right: -5px; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
     </style>
 </head>
 <body>
@@ -155,27 +159,12 @@
                 updateBoundingBox(element);
             };
             
-            ['tl', 'tr', 'bl', 'br'].forEach(pos => {
+            ["tl", "tr", "bl", "br", "tm", "bm", "ml", "mr"].forEach(pos => {
                 const handle = document.createElement("div");
                 handle.classList.add("resize-handle", `handle-${pos}`);
                 boundingBox.appendChild(handle);
                 handle.onmousedown = function(event) {
                     event.stopPropagation();
-                    const startX = event.clientX;
-                    const startY = event.clientY;
-                    const startWidth = element.offsetWidth;
-                    const startHeight = element.offsetHeight;
-                    document.onmousemove = function(event) {
-                        let newWidth = startWidth + (event.clientX - startX);
-                        let newHeight = startHeight + (event.clientY - startY);
-                        element.style.width = Math.max(20, newWidth) + 'px';
-                        element.style.height = Math.max(20, newHeight) + 'px';
-                        updateBoundingBox(element);
-                    };
-                    document.onmouseup = function() {
-                        document.onmousemove = null;
-                        document.onmouseup = null;
-                    };
                 };
             });
         }
