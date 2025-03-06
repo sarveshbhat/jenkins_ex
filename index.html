@@ -222,15 +222,10 @@
                 const resizeDot = document.createElement("div");
                 resizeDot.classList.add("resize-dot", position);
                 resizeDot.style.position = "absolute";
-                resizeDot.style.width = "10px";
-                resizeDot.style.height = "10px";
-                resizeDot.style.borderRadius = "50%";
-                resizeDot.style.backgroundColor = "black";
-                resizeDot.style.cursor = "nwse-resize"; 
                 boundingBox.appendChild(resizeDot);
 
                 resizeDot.onmousedown = function(e) {
-                    e.stopPropagation(); 
+                    e.stopPropagation(); // Prevent event from bubbling
 
                     const initialWidth = element.offsetWidth;
                     const initialHeight = element.offsetHeight;
@@ -288,7 +283,7 @@
 
             // Handle dynamic rotation based on mouse position
             rotateDot.onmousedown = function(e) {
-                e.stopPropagation(); 
+                e.stopPropagation(); // Prevent event from bubbling
 
                 const centerX = element.offsetLeft + element.offsetWidth / 2;
                 const centerY = element.offsetTop + element.offsetHeight / 2;
@@ -334,6 +329,7 @@
         }
 
         updateGrid();
+
 
     </script>
 </body>
