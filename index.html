@@ -62,31 +62,65 @@
             width: 50px;
             height: 50px;
         }
-        .dot {
+
+        /* Style for the grid container */
+        #gridContainer {
+            display: grid;
+            position: relative;
+        }
+
+        /* Bounding box styles */
+        .bounding-box {
+            border: 2px dashed #000;
             position: absolute;
+            pointer-events: none; /* Bounding box should not capture mouse events */
+        }
+
+        /* Resize dot styles */
+        .resize-dot {
             width: 10px;
             height: 10px;
-            background-color: black;
             border-radius: 50%;
+            background-color: black;
+            position: absolute;
             cursor: pointer;
         }
 
-        .resize-dot {
+        .resize-dot.top-left {
             top: -5px;
-            left: calc(100% - 5px);
-            background-color: black;
+            left: -5px;
             cursor: nwse-resize;
         }
 
-        .rotate-dot {
+        .resize-dot.top-right {
             top: -5px;
-            left: -5px;
-            background-color: red;
-            cursor: pointer;
+            right: -5px;
+            cursor: nesw-resize;
         }
 
+        .resize-dot.bottom-left {
+            bottom: -5px;
+            left: -5px;
+            cursor: nesw-resize;
+        }
 
+        .resize-dot.bottom-right {
+            bottom: -5px;
+            right: -5px;
+            cursor: nwse-resize;
+        }
 
+        /* Rotation dot style */
+        .rotate-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: red;
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            cursor: pointer;
+        }
 
         .red-circle { background: red; border-radius: 50%; }
         .green-circle { background: green; border-radius: 50%; }
