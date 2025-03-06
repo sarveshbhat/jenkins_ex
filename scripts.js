@@ -168,6 +168,27 @@ function addTextbox() {
     makeTransformable(textbox);
 }
 
+// Ensure the text box and its container resize dynamically based on content
+function adjustTextBoxSize() {
+    const textBoxContainer = document.querySelector('.text-box-container');
+    const textBox = document.querySelector('.text-box');
+    
+    // Adjust the height of the text box based on its content
+    textBox.style.height = 'auto';  // Reset to auto to calculate new height
+    textBox.style.height = `${textBox.scrollHeight}px`; // Set to scrollHeight to fit content
+    
+    // Optionally, adjust container size if needed (e.g., resize it based on the text area)
+    textBoxContainer.style.height = `${textBox.scrollHeight + 20}px`;  // Add padding or margin as necessary
+}
+
+// Add event listeners to auto adjust on input or resizing
+document.querySelector('.text-box').addEventListener('input', adjustTextBoxSize);
+window.addEventListener('resize', adjustTextBoxSize);
+
+// Initial size adjustment when the page loads
+window.addEventListener('load', adjustTextBoxSize);
+
+
 function addShape(type) {
     const shape = document.createElement("div");
     shape.classList.add("draggable", type);
