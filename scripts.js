@@ -159,10 +159,10 @@ function addShape(type) {
     shape.style.transform = `scale(${gridScale})`;  
 }
 
-function makeTransformableShape(element) {
-    let offsetX, offsetY;
+function makeResizable(element) {
+    let initialWidth, initialHeight, initialX, initialY;
 
-    // Create the bounding box
+    // Create the bounding box for resizing
     const boundingBox = document.createElement("div");
     boundingBox.classList.add("bounding-box");
     boundingBox.style.position = "absolute";
@@ -170,49 +170,48 @@ function makeTransformableShape(element) {
     boundingBox.style.pointerEvents = "none"; // Bounding box should not capture events
     element.appendChild(boundingBox);
 
-    // Add the resizing and rotating dots
+    // Add the resizing dots at the corners
     const resizeDots = ["top-left", "top-right", "bottom-left", "bottom-right"];
     resizeDots.forEach(position => {
         const resizeDot = document.createElement("div");
         resizeDot.classList.add("resize-dot", position);
         resizeDot.style.position = "absolute";
+        resizeDot.style.width = "10px";
+        resizeDot.style.height = "10px";
+        resizeDot.style.backgroundColor = "blue";  // Just for visibility
         boundingBox.appendChild(resizeDot);
 
+        // Resizing logic for each corner
         resizeDot.onmousedown = function(e) {
             e.stopPropagation(); // Prevent event from bubbling
 
-            const initialWidth = element.offsetWidth;
-            const initialHeight = element.offsetHeight;
-            const initialLeft = element.offsetLeft;
-            const initialTop = element.offsetTop;
-
-            const initialX = e.clientX;
-            const initialY = e.clientY;
+            initialWidth = element.offsetWidth;
+            initialHeight = element.offsetHeight;
+            initialX = e.clientX;
+            initialY = e.clientY;
 
             document.onmousemove = function(e) {
                 const dx = e.clientX - initialX;
                 const dy = e.clientY - initialY;
 
-                // Adjust the element size based on drag direction
+                // Adjust the element's size based on which corner is being dragged
                 if (position === "top-left") {
                     element.style.width = Math.max(20, initialWidth - dx) + "px";
                     element.style.height = Math.max(20, initialHeight - dy) + "px";
-                    element.style.left = initialLeft + dx + "px";
-                    element.style.top = initialTop + dy + "px";
+                    element.style.left = element.offsetLeft + dx + "px";
+                    element.style.top = element.offsetTop + dy + "px";
                 } else if (position === "top-right") {
                     element.style.width = Math.max(20, initialWidth + dx) + "px";
                     element.style.height = Math.max(20, initialHeight - dy) + "px";
-                    element.style.top = initialTop + dy + "px";
+                    element.style.top = element.offsetTop + dy + "px";
                 } else if (position === "bottom-left") {
                     element.style.width = Math.max(20, initialWidth - dx) + "px";
                     element.style.height = Math.max(20, initialHeight + dy) + "px";
-                    element.style.left = initialLeft + dx + "px";
+                    element.style.left = element.offsetLeft + dx + "px";
                 } else if (position === "bottom-right") {
                     element.style.width = Math.max(20, initialWidth + dx) + "px";
                     element.style.height = Math.max(20, initialHeight + dy) + "px";
                 }
-
-                updateBoundingBox(element);
             };
 
             document.onmouseup = function() {
@@ -222,64 +221,17 @@ function makeTransformableShape(element) {
         };
     });
 
-    // Create the rotation dot
-    const rotateDot = document.createElement("div");
-    rotateDot.classList.add("rotate-dot");
-    rotateDot.style.position = "absolute";
-    rotateDot.style.top = `50%`;
-    rotateDot.style.right = `-15px`;
-    rotateDot.style.width = "10px";
-    rotateDot.style.height = "10px";
-    rotateDot.style.borderRadius = "50%";
-    rotateDot.style.backgroundColor = "red";
-    rotateDot.style.cursor = "pointer";
-    boundingBox.appendChild(rotateDot);
-
-    // Handle dynamic rotation based on mouse position
-    rotateDot.onmousedown = function(e) {
-        e.stopPropagation(); // Prevent event from bubbling
-
-        const centerX = element.offsetLeft + element.offsetWidth / 2;
-        const centerY = element.offsetTop + element.offsetHeight / 2;
-
-        let initialAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
-
-        document.onmousemove = function(e) {
-            const currentAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
-            const angleDifference = (currentAngle - initialAngle) * (180 / Math.PI); // Convert to degrees
-            element.style.transform = `rotate(${angleDifference}deg)`; 
-
-            updateBoundingBox(element);
-        };
-
-        document.onmouseup = function() {
-            document.onmousemove = null;
-            document.onmouseup = null;
-        };
-    };
-
-    // Dragging functionality for the whole shape (including the bounding box)
-    element.onmousedown = function(event) {
-        offsetX = event.clientX - element.offsetLeft;
-        offsetY = event.clientY - element.offsetTop;
-        document.onmousemove = function(event) {
-            element.style.left = event.clientX - offsetX + 'px';
-            element.style.top = event.clientY - offsetY + 'px';
-            updateBoundingBox(element);
-        };
-        document.onmouseup = function() {
-            document.onmousemove = null;
-            document.onmouseup = null;
-        };
-    };
-
-    // Update the bounding box to follow the element's position and size
-    function updateBoundingBox(element) {
+    // Update the bounding box to follow the element's size and position
+    function updateBoundingBox() {
         boundingBox.style.left = `${element.offsetLeft}px`;
         boundingBox.style.top = `${element.offsetTop}px`;
         boundingBox.style.width = `${element.offsetWidth}px`;
         boundingBox.style.height = `${element.offsetHeight}px`;
     }
+
+    // Initial bounding box update
+    updateBoundingBox();
 }
+
 
 updateGrid();
