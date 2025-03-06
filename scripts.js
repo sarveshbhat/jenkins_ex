@@ -15,9 +15,15 @@ function updateGrid() {
     }
 
     grid.style.transform = `scale(${gridScale})`;
+    grid.style.transformOrigin = "top left";  // Ensures grid zooms from the top left
+
     const allShapes = document.querySelectorAll(".draggable");
     allShapes.forEach(shape => {
         shape.style.transform = `scale(${gridScale})`;
+        // Reposition textboxes if necessary after zooming
+        const rect = shape.getBoundingClientRect();
+        shape.style.left = `${rect.left}px`;
+        shape.style.top = `${rect.top}px`;
     });
 }
 
@@ -150,7 +156,7 @@ function addTextbox() {
     textbox.contentEditable = true; // Make the textbox editable
 
     // Add some initial content to show resize based on content
-    textbox.textContent = "Resize me based on my content!";
+    textbox.textContent = "edit";
     
     // Append the textbox to the grid container
     const gridContainer = document.getElementById("gridContainer");
@@ -165,6 +171,10 @@ function addTextbox() {
 
     // Make the textbox transformable (draggable and resizable)
     makeTransformable(textbox);
+    
+    // Update position after zoom
+    textbox.style.left = `${textbox.offsetLeft}px`;
+    textbox.style.top = `${textbox.offsetTop}px`;
 }
 
 function addShape(type) {
