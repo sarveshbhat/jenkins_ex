@@ -8,11 +8,33 @@
         body {
             font-family: Arial, sans-serif;
             display: flex;
+            height: 100vh;
+            margin: 0;
+        }
+        .sidebar {
+            width: 150px;
+            background: #ddd;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+        .tab {
+            padding: 10px;
+            cursor: pointer;
+            background: #bbb;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        .tab:hover {
+            background: #aaa;
+        }
+        .canvas-container {
+            flex-grow: 1;
+            display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
+            position: relative;
         }
         .controls {
             position: absolute;
@@ -31,15 +53,33 @@
             background-color: lightgray;
             border: 1px solid black;
         }
+        .draggable {
+            position: absolute;
+            cursor: grab;
+            width: 50px;
+            height: 50px;
+        }
+        .red-circle { background: red; border-radius: 50%; }
+        .green-circle { background: green; border-radius: 50%; }
+        .black-outline { border: 3px solid black; border-radius: 50%; background: transparent; }
+        .gray-blob { background: gray; border-radius: 20%; }
     </style>
 </head>
 <body>
-    <div class="controls">
-        <label for="gridSize">Grid Size:</label>
-        <input type="number" id="gridSize" min="1" max="50" value="5">
-        <button onclick="updateGrid()">Update</button>
+    <div class="sidebar">
+        <div class="tab" onclick="addShape('red-circle')">Monsters</div>
+        <div class="tab" onclick="addShape('green-circle')">Characters</div>
+        <div class="tab" onclick="addShape('black-outline')">Spells</div>
+        <div class="tab" onclick="addShape('gray-blob')">Terrain</div>
     </div>
-    <div id="gridContainer" class="grid"></div>
+    <div class="canvas-container">
+        <div class="controls">
+            <label for="gridSize">Grid Size:</label>
+            <input type="number" id="gridSize" min="1" max="50" value="5">
+            <button onclick="updateGrid()">Update</button>
+        </div>
+        <div id="gridContainer" class="grid"></div>
+    </div>
 
     <script>
         function updateGrid() {
@@ -56,7 +96,43 @@
             }
         }
 
+        function addShape(type) {
+            const shape = document.createElement("div");
+            shape.classList.add("draggable", type);
+            document.body.appendChild(shape);
+            makeDraggable(shape);
+        }
+
+        function makeDraggable(element) {
+            let offsetX, offsetY, rotation = 0, scale = 1;
+            
+            element.onmousedown = function(event) {
+                offsetX = event.clientX - element.offsetLeft;
+                offsetY = event.clientY - element.offsetTop;
+                document.onmousemove = function(event) {
+                    element.style.left = event.clientX - offsetX + 'px';
+                    element.style.top = event.clientY - offsetY + 'px';
+                };
+                document.onmouseup = function() {
+                    document.onmousemove = null;
+                    document.onmouseup = null;
+                };
+            };
+            
+            element.onwheel = function(event) {
+                if (event.shiftKey) {
+                    rotation += event.deltaY > 0 ? 15 : -15;
+                    element.style.transform = `rotate(${rotation}deg) scale(${scale})`;
+                } else {
+                    scale += event.deltaY > 0 ? -0.1 : 0.1;
+                    element.style.transform = `rotate(${rotation}deg) scale(${scale})`;
+                }
+                event.preventDefault();
+            };
+        }
+
         updateGrid();
     </script>
 </body>
 </html>
+
