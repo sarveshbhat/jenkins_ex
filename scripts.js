@@ -146,11 +146,11 @@ function addTextbox() {
     textbox.style.position = "absolute";
     textbox.style.border = "2px solid #000";
     textbox.style.backgroundColor = "#fff";
-    textbox.style.padding = "5px";
+    textbox.style.padding = "1px";
     textbox.contentEditable = true; // Make the textbox editable
 
     // Add some initial content to show resize based on content
-    textbox.textContent = "Resize me based on my content!";
+    textbox.textContent = "Edit";
     
     // Append the textbox to the grid container
     const gridContainer = document.getElementById("gridContainer");
