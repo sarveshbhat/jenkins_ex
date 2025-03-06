@@ -64,15 +64,28 @@
         }
         .arrow {
             position: absolute;
-            top: -10px;
-            left: calc(100% - 10px);
             width: 10px;
             height: 10px;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .resize-arrow {
+            top: -10px;
+            left: calc(100% - 10px);
             border-left: 2px solid black;
             border-top: 2px solid black;
             transform: rotate(45deg);
-            cursor: pointer;
         }
+
+        .pivot-arrow {
+            top: calc(100% + 10px);
+            left: calc(100% - 10px);
+            border-left: 2px solid black;
+            border-top: 2px solid black;
+            transform: rotate(135deg);
+        }
+
 
         .red-circle { background: red; border-radius: 50%; }
         .green-circle { background: green; border-radius: 50%; }
@@ -176,25 +189,26 @@
                 };
             };
 
-            // Create the arrow on right-click
+            // Create the right-click arrow to resize
             element.oncontextmenu = function(event) {
                 event.preventDefault(); // Prevent the default right-click menu
 
-                // Create and show the arrow in the top-right corner of the shape
-                const arrow = document.createElement("div");
-                arrow.classList.add("arrow");
-                arrow.style.position = "absolute";
-                arrow.style.top = `-10px`;
-                arrow.style.left = `calc(100% - 10px)`;
-                arrow.style.width = "10px";
-                arrow.style.height = "10px";
-                arrow.style.borderLeft = "2px solid black";
-                arrow.style.borderTop = "2px solid black";
-                arrow.style.transform = "rotate(45deg)";
-                element.appendChild(arrow);
+                // Create and show the resize arrow in the top-right corner of the shape
+                const resizeArrow = document.createElement("div");
+                resizeArrow.classList.add("arrow", "resize-arrow");
+                resizeArrow.style.position = "absolute";
+                resizeArrow.style.top = `-10px`;
+                resizeArrow.style.left = `calc(100% - 10px)`;
+                resizeArrow.style.width = "10px";
+                resizeArrow.style.height = "10px";
+                resizeArrow.style.borderLeft = "2px solid black";
+                resizeArrow.style.borderTop = "2px solid black";
+                resizeArrow.style.transform = "rotate(45deg)";
+                resizeArrow.style.cursor = "nwse-resize";
+                element.appendChild(resizeArrow);
 
-                // Allow manipulation with the arrow
-                arrow.onmousedown = function(e) {
+                // Allow resizing with this arrow
+                resizeArrow.onmousedown = function(e) {
                     e.stopPropagation(); // Prevent the shape's mousemove event from firing
 
                     let startX = e.clientX;
@@ -225,8 +239,41 @@
                     document.onmouseup = function() {
                         document.onmousemove = null;
                         document.onmouseup = null;
-                        element.removeChild(arrow); // Remove the arrow when done resizing
+                        element.removeChild(resizeArrow); // Remove the arrow when done resizing
                     };
+                };
+
+                // Create and show the pivot toggle arrow
+                const pivotArrow = document.createElement("div");
+                pivotArrow.classList.add("arrow", "pivot-arrow");
+                pivotArrow.style.position = "absolute";
+                pivotArrow.style.top = `calc(100% + 10px)`;
+                pivotArrow.style.left = `calc(100% - 10px)`;
+                pivotArrow.style.width = "10px";
+                pivotArrow.style.height = "10px";
+                pivotArrow.style.borderLeft = "2px solid black";
+                pivotArrow.style.borderTop = "2px solid black";
+                pivotArrow.style.transform = "rotate(135deg)";
+                pivotArrow.style.cursor = "pointer";
+                element.appendChild(pivotArrow);
+
+                // Toggle pivot points when clicking the pivot arrow
+                pivotArrow.onclick = function() {
+                    const currentTransformOrigin = element.style.transformOrigin;
+                    switch (currentTransformOrigin) {
+                        case "bottom left":
+                            element.style.transformOrigin = "top left";
+                            break;
+                        case "top left":
+                            element.style.transformOrigin = "center";
+                            break;
+                        case "center":
+                            element.style.transformOrigin = "bottom left";
+                            break;
+                        default:
+                            element.style.transformOrigin = "bottom left";
+                            break;
+                    }
                 };
             };
         }
