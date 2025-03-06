@@ -264,19 +264,45 @@
                 rotateDot.style.cursor = "pointer";
                 element.appendChild(rotateDot);
 
-                // Handle rotation with the rotation dot
-                let rotationAngle = 0;
-                rotateDot.onclick = function() {
-                    rotationAngle += 45; // Rotate by 45 degrees each time
-                    if (rotationAngle >= 360) {
-                        rotationAngle = 0; // Reset to 0 after a full rotation
+                // Handle dynamic rotation based on mouse position
+                let isRotating = false;
+                let initialAngle = 0;
+
+                rotateDot.onmousedown = function(e) {
+                    e.stopPropagation(); // Prevent the shape's mousemove event from firing
+
+                    const centerX = element.offsetLeft + element.offsetWidth / 2;
+                    const centerY = element.offsetTop + element.offsetHeight / 2;
+
+                    // Function to calculate angle between two points
+                    function calculateAngle(x, y) {
+                        const dx = x - centerX;
+                        const dy = y - centerY;
+                        return Math.atan2(dy, dx) * (180 / Math.PI); // Angle in degrees
                     }
-                    element.style.transform = `rotate(${rotationAngle}deg)`;
+
+                    initialAngle = calculateAngle(e.clientX, e.clientY);
+                    isRotating = true;
+
+                    document.onmousemove = function(e) {
+                        if (isRotating) {
+                            const currentAngle = calculateAngle(e.clientX, e.clientY);
+                            const angleDifference = currentAngle - initialAngle;
+                            element.style.transform = `rotate(${angleDifference}deg)`; // Apply rotation dynamically
+                        }
+                    };
+
+                    document.onmouseup = function() {
+                        isRotating = false;
+                        document.onmousemove = null;
+                        document.onmouseup = null;
+                    };
                 };
             };
         }
 
         updateGrid();
+
 
     </script>
 </body>
