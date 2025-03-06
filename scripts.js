@@ -49,8 +49,9 @@ function makeTransformable(element) {
     const boundingBox = document.createElement("div");
     boundingBox.classList.add("bounding-box");
     boundingBox.style.position = "absolute";
-    boundingBox.style.border = "2px dashed #000";
+    boundingBox.style.border = "2px dashed #ff0000";  // Red dashed border for visibility
     boundingBox.style.pointerEvents = "none"; // Bounding box should not capture events
+    boundingBox.style.zIndex = 10;  // Ensure it is on top of other elements
     element.appendChild(boundingBox);
 
     // Add the resizing dots
@@ -59,6 +60,10 @@ function makeTransformable(element) {
         const resizeDot = document.createElement("div");
         resizeDot.classList.add("resize-dot", position);
         resizeDot.style.position = "absolute";
+        resizeDot.style.backgroundColor = "#ff0000";  // Make dots visible
+        resizeDot.style.width = "10px";  // Size of the dots
+        resizeDot.style.height = "10px"; // Size of the dots
+        resizeDot.style.borderRadius = "50%"; // Make the dots round
         boundingBox.appendChild(resizeDot);
 
         // Dragging behavior for resizing
@@ -133,6 +138,7 @@ function makeTransformable(element) {
         };
     };
 }
+
 
 function addTextbox() {
     // Create the textbox div
