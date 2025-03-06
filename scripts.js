@@ -45,8 +45,29 @@ function addTextbox() {
     const gridContainer = document.getElementById("gridContainer");
     gridContainer.appendChild(textbox);
 
+    // Automatically resize the textbox based on content
+    resizeTextbox(textbox);
+
+    // Observe changes in the content and resize the box
+    const observer = new MutationObserver(() => resizeTextbox(textbox));
+    observer.observe(textbox, { childList: true, subtree: true });
+
     // Make the textbox transformable (draggable and resizable)
     makeTransformable(textbox);
+}
+
+function resizeTextbox(textbox) {
+    // Set the width to fit content
+    textbox.style.width = "auto";
+    textbox.style.height = "auto";
+
+    // Get the natural size based on content
+    const contentWidth = textbox.scrollWidth;
+    const contentHeight = textbox.scrollHeight;
+
+    // Apply the new size to the textbox
+    textbox.style.width = `${contentWidth + 10}px`; // Adding padding
+    textbox.style.height = `${contentHeight + 10}px`; // Adding padding
 }
 
 function makeTransformable(element) {
@@ -128,16 +149,17 @@ function makeTransformable(element) {
 
 
 
+
 function addShape(type) {
     const shape = document.createElement("div");
     shape.classList.add("draggable", type);
     shape.style.position = "absolute";
     document.body.appendChild(shape);
-    makeTransformable(shape);
+    makeTransformableShape(shape);
     shape.style.transform = `scale(${gridScale})`;  
 }
 
-function makeTransformable(element) {
+function makeTransformableShape(element) {
     let offsetX, offsetY;
 
     // Create the bounding box
