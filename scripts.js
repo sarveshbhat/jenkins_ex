@@ -23,7 +23,7 @@ function updateGrid() {
 
 function zoomGrid(event) {
     gridScale += event.deltaY > 0 ? -0.1 : 0.1;
-    gridScale = Math.max(0.5, Math.min(gridScale, 2)); 
+    gridScale = Math.max(0.1, Math.min(gridScale, 10)); 
     updateGrid();
     event.preventDefault();
 }
@@ -51,7 +51,7 @@ function addTextbox() {
 function makeTransformable(element) {
     let offsetX, offsetY;
 
-    // Create the bounding box
+    // Create the bounding box for resizing
     const boundingBox = document.createElement("div");
     boundingBox.classList.add("bounding-box");
     boundingBox.style.position = "absolute";
@@ -59,7 +59,7 @@ function makeTransformable(element) {
     boundingBox.style.pointerEvents = "none"; // Bounding box should not capture events
     element.appendChild(boundingBox);
 
-    // Add the resizing and rotating dots
+    // Add the resizing dots
     const resizeDots = ["top-left", "top-right", "bottom-left", "bottom-right"];
     resizeDots.forEach(position => {
         const resizeDot = document.createElement("div");
@@ -67,6 +67,7 @@ function makeTransformable(element) {
         resizeDot.style.position = "absolute";
         boundingBox.appendChild(resizeDot);
 
+        // Dragging behavior for resizing
         resizeDot.onmousedown = function(e) {
             e.stopPropagation(); // Prevent event from bubbling
 
@@ -82,7 +83,7 @@ function makeTransformable(element) {
                 const dx = e.clientX - initialX;
                 const dy = e.clientY - initialY;
 
-                // Adjust the element size based on drag direction
+                // Adjust the element size based on the direction of the resize handle
                 if (position === "top-left") {
                     element.style.width = Math.max(20, initialWidth - dx) + "px";
                     element.style.height = Math.max(20, initialHeight - dy) + "px";
@@ -101,6 +102,7 @@ function makeTransformable(element) {
                     element.style.height = Math.max(20, initialHeight + dy) + "px";
                 }
 
+                // Update the bounding box position and size to match the element
                 updateBoundingBox(element);
             };
 
@@ -110,6 +112,19 @@ function makeTransformable(element) {
             };
         };
     });
+
+    // Update the bounding box to match the size of the element
+    function updateBoundingBox(element) {
+        boundingBox.style.width = element.offsetWidth + "px";
+        boundingBox.style.height = element.offsetHeight + "px";
+        boundingBox.style.top = 0;
+        boundingBox.style.left = 0;
+    }
+
+    // Initial update for the bounding box
+    updateBoundingBox(element);
+}
+
 
     // Create the rotation dot
     const rotateDot = document.createElement("div");
@@ -169,7 +184,7 @@ function makeTransformable(element) {
         boundingBox.style.width = `${element.offsetWidth}px`;
         boundingBox.style.height = `${element.offsetHeight}px`;
     }
-}
+
 
 
 function addShape(type) {
