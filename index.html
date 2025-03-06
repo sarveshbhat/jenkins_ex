@@ -61,22 +61,17 @@
             cursor: grab;
             width: 50px;
             height: 50px;
+            transition: all 0.3s ease;
         }
-
-        /* Style for the grid container */
-        #gridContainer {
-            display: grid;
-            position: relative;
+        .selected {
+            border: 2px solid blue;
         }
-
-        /* Bounding box styles */
         .bounding-box {
             border: 2px dashed #000;
             position: absolute;
             pointer-events: none; /* Bounding box should not capture mouse events */
+            display: none; /* Hide initially */
         }
-
-        /* Resize dot styles */
         .resize-dot {
             width: 10px;
             height: 10px;
@@ -85,32 +80,26 @@
             position: absolute;
             cursor: pointer;
         }
-
         .resize-dot.top-left {
             top: -5px;
             left: -5px;
             cursor: nwse-resize;
         }
-
         .resize-dot.top-right {
             top: -5px;
             right: -5px;
             cursor: nesw-resize;
         }
-
         .resize-dot.bottom-left {
             bottom: -5px;
             left: -5px;
             cursor: nesw-resize;
         }
-
         .resize-dot.bottom-right {
             bottom: -5px;
             right: -5px;
             cursor: nwse-resize;
         }
-
-        /* Rotation dot style */
         .rotate-dot {
             width: 10px;
             height: 10px;
@@ -122,31 +111,22 @@
             cursor: pointer;
         }
 
-        .red-circle { background: red; border-radius: 50%; }
-        .green-circle { background: green; border-radius: 50%; }
-        .black-outline { border: 3px solid black; border-radius: 50%; background: transparent; }
-        .gray-blob { background: gray; border-radius: 20%; }
-        .bounding-box {
+        /* Transform toolbar styles */
+        .transform-toolbar {
             position: absolute;
-            border: 1px dashed black;
-            pointer-events: none;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+            color: white;
             display: none;
         }
-        .resize-handle {
-            width: 10px;
-            height: 10px;
-            background: white;
-            border: 1px solid black;
-            position: absolute;
+        .transform-toolbar button {
+            margin: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
         }
-        .handle-tl { top: -5px; left: -5px; cursor: nwse-resize; }
-        .handle-tr { top: -5px; right: -5px; cursor: nesw-resize; }
-        .handle-bl { bottom: -5px; left: -5px; cursor: nesw-resize; }
-        .handle-br { bottom: -5px; right: -5px; cursor: nwse-resize; }
-        .handle-tm { top: -5px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
-        .handle-bm { bottom: -5px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
-        .handle-ml { left: -5px; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
-        .handle-mr { right: -5px; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
     </style>
 </head>
 <body>
@@ -163,10 +143,15 @@
             <button onclick="updateGrid()">Update</button>
         </div>
         <div id="gridContainer" class="grid"></div>
+        <div id="transformToolbar" class="transform-toolbar">
+            <button onclick="rotateShape()">Rotate</button>
+            <button onclick="deleteShape()">Delete</button>
+        </div>
     </div>
 
     <script>
         let gridScale = 1;
+        let selectedShape = null;
 
         function updateGrid() {
             const size = document.getElementById("gridSize").value;
@@ -200,28 +185,35 @@
             const shape = document.createElement("div");
             shape.classList.add("draggable", type);
             shape.style.position = "absolute";
+            shape.style.transform = `scale(${gridScale})`;  
+            shape.addEventListener("click", () => selectShape(shape));
             document.body.appendChild(shape);
             makeTransformable(shape);
-            shape.style.transform = `scale(${gridScale})`;  
+        }
+
+        function selectShape(shape) {
+            if (selectedShape) {
+                selectedShape.classList.remove("selected");
+                selectedShape.querySelector(".bounding-box").style.display = "none";
+            }
+            selectedShape = shape;
+            selectedShape.classList.add("selected");
+            const boundingBox = selectedShape.querySelector(".bounding-box");
+            boundingBox.style.display = "block"; // Show bounding box
+            document.getElementById("transformToolbar").style.display = "block"; // Show transform toolbar
         }
 
         function makeTransformable(element) {
-            let offsetX, offsetY;
-
             // Create the bounding box
             const boundingBox = document.createElement("div");
             boundingBox.classList.add("bounding-box");
-            boundingBox.style.position = "absolute";
-            boundingBox.style.border = "2px dashed #000";
-            boundingBox.style.pointerEvents = "none"; // Bounding box should not capture events
             element.appendChild(boundingBox);
 
-            // Add the resizing and rotating dots
+            // Resize functionality
             const resizeDots = ["top-left", "top-right", "bottom-left", "bottom-right"];
             resizeDots.forEach(position => {
                 const resizeDot = document.createElement("div");
                 resizeDot.classList.add("resize-dot", position);
-                resizeDot.style.position = "absolute";
                 boundingBox.appendChild(resizeDot);
 
                 resizeDot.onmousedown = function(e) {
@@ -229,9 +221,6 @@
 
                     const initialWidth = element.offsetWidth;
                     const initialHeight = element.offsetHeight;
-                    const initialLeft = element.offsetLeft;
-                    const initialTop = element.offsetTop;
-
                     const initialX = e.clientX;
                     const initialY = e.clientY;
 
@@ -239,20 +228,15 @@
                         const dx = e.clientX - initialX;
                         const dy = e.clientY - initialY;
 
-                        // Adjust the element size based on drag direction
                         if (position === "top-left") {
                             element.style.width = Math.max(20, initialWidth - dx) + "px";
                             element.style.height = Math.max(20, initialHeight - dy) + "px";
-                            element.style.left = initialLeft + dx + "px";
-                            element.style.top = initialTop + dy + "px";
                         } else if (position === "top-right") {
                             element.style.width = Math.max(20, initialWidth + dx) + "px";
                             element.style.height = Math.max(20, initialHeight - dy) + "px";
-                            element.style.top = initialTop + dy + "px";
                         } else if (position === "bottom-left") {
                             element.style.width = Math.max(20, initialWidth - dx) + "px";
                             element.style.height = Math.max(20, initialHeight + dy) + "px";
-                            element.style.left = initialLeft + dx + "px";
                         } else if (position === "bottom-right") {
                             element.style.width = Math.max(20, initialWidth + dx) + "px";
                             element.style.height = Math.max(20, initialHeight + dy) + "px";
@@ -268,33 +252,21 @@
                 };
             });
 
-            // Create the rotation dot
+            // Rotation functionality
             const rotateDot = document.createElement("div");
             rotateDot.classList.add("rotate-dot");
-            rotateDot.style.position = "absolute";
-            rotateDot.style.top = `50%`;
-            rotateDot.style.right = `-15px`;
-            rotateDot.style.width = "10px";
-            rotateDot.style.height = "10px";
-            rotateDot.style.borderRadius = "50%";
-            rotateDot.style.backgroundColor = "red";
-            rotateDot.style.cursor = "pointer";
             boundingBox.appendChild(rotateDot);
 
-            // Handle dynamic rotation based on mouse position
             rotateDot.onmousedown = function(e) {
-                e.stopPropagation(); // Prevent event from bubbling
-
+                e.stopPropagation();
                 const centerX = element.offsetLeft + element.offsetWidth / 2;
                 const centerY = element.offsetTop + element.offsetHeight / 2;
-
                 let initialAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
 
                 document.onmousemove = function(e) {
                     const currentAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
                     const angleDifference = (currentAngle - initialAngle) * (180 / Math.PI); // Convert to degrees
-                    element.style.transform = `rotate(${angleDifference}deg)`; 
-
+                    element.style.transform = `rotate(${angleDifference}deg)`;
                     updateBoundingBox(element);
                 };
 
@@ -304,10 +276,10 @@
                 };
             };
 
-            // Dragging functionality for the whole shape (including the bounding box)
+            // Drag functionality
             element.onmousedown = function(event) {
-                offsetX = event.clientX - element.offsetLeft;
-                offsetY = event.clientY - element.offsetTop;
+                const offsetX = event.clientX - element.offsetLeft;
+                const offsetY = event.clientY - element.offsetTop;
                 document.onmousemove = function(event) {
                     element.style.left = event.clientX - offsetX + 'px';
                     element.style.top = event.clientY - offsetY + 'px';
@@ -319,7 +291,7 @@
                 };
             };
 
-            // Update the bounding box to follow the element's position and size
+            // Update bounding box
             function updateBoundingBox(element) {
                 boundingBox.style.left = `${element.offsetLeft}px`;
                 boundingBox.style.top = `${element.offsetTop}px`;
@@ -328,9 +300,21 @@
             }
         }
 
+        function rotateShape() {
+            if (selectedShape) {
+                let angle = parseFloat(selectedShape.style.transform.replace("rotate(", "").replace("deg)", "")) || 0;
+                selectedShape.style.transform = `rotate(${angle + 15}deg)`;
+            }
+        }
+
+        function deleteShape() {
+            if (selectedShape) {
+                selectedShape.remove();
+                document.getElementById("transformToolbar").style.display = "none";
+            }
+        }
+
         updateGrid();
-
-
     </script>
 </body>
 </html>
