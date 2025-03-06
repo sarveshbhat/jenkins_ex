@@ -70,6 +70,7 @@
             position: absolute;
             border: 1px dashed black;
             pointer-events: none;
+            display: none;
         }
         .resize-handle {
             width: 10px;
@@ -138,6 +139,7 @@
                 document.onmousemove = function(event) {
                     element.style.left = event.clientX - offsetX + 'px';
                     element.style.top = event.clientY - offsetY + 'px';
+                    updateBoundingBox(element);
                 };
                 document.onmouseup = function() {
                     document.onmousemove = null;
@@ -147,9 +149,13 @@
             
             const boundingBox = document.createElement("div");
             boundingBox.classList.add("bounding-box");
-            element.appendChild(boundingBox);
-            const handles = ['tl', 'tr', 'bl', 'br'];
-            handles.forEach(pos => {
+            document.body.appendChild(boundingBox);
+            element.onclick = function() {
+                boundingBox.style.display = "block";
+                updateBoundingBox(element);
+            };
+            
+            ['tl', 'tr', 'bl', 'br'].forEach(pos => {
                 const handle = document.createElement("div");
                 handle.classList.add("resize-handle", `handle-${pos}`);
                 boundingBox.appendChild(handle);
@@ -164,6 +170,7 @@
                         let newHeight = startHeight + (event.clientY - startY);
                         element.style.width = Math.max(20, newWidth) + 'px';
                         element.style.height = Math.max(20, newHeight) + 'px';
+                        updateBoundingBox(element);
                     };
                     document.onmouseup = function() {
                         document.onmousemove = null;
@@ -173,7 +180,16 @@
             });
         }
 
+        function updateBoundingBox(element) {
+            const box = document.querySelector(".bounding-box");
+            box.style.left = element.offsetLeft + 'px';
+            box.style.top = element.offsetTop + 'px';
+            box.style.width = element.offsetWidth + 'px';
+            box.style.height = element.offsetHeight + 'px';
+        }
+
         updateGrid();
     </script>
 </body>
 </html>
+
