@@ -136,7 +136,7 @@
         }
 
         function makeTransformable(element) {
-            let offsetX, offsetY;
+            let offsetX, offsetY, startWidth, startHeight;
             element.onmousedown = function(event) {
                 offsetX = event.clientX - element.offsetLeft;
                 offsetY = event.clientY - element.offsetTop;
@@ -159,10 +159,7 @@
                 updateBoundingBox(element);
             };
             
-            ["tl", "tr", "bl", "br", "tm", "bm", "ml", "mr"].forEach(pos => {
-                const handle = document.createElement("div");
-                handle.classList.add("resize-handle", `handle-${pos}`);
-                boundingBox.appendChild(handle);
+            document.querySelectorAll(".resize-handle").forEach(handle => {
                 handle.onmousedown = function(event) {
                     event.stopPropagation();
                 };
@@ -181,4 +178,3 @@
     </script>
 </body>
 </html>
-
