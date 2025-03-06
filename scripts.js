@@ -166,9 +166,13 @@ function addShape(type) {
     const shape = document.createElement("div");
     shape.classList.add("draggable", type);
     shape.style.position = "absolute";
+    shape.style.width = "100px"; // Default width
+    shape.style.height = "100px"; // Default height
+    shape.style.backgroundColor = "gray"; // Default color
     document.body.appendChild(shape);
     makeTransformable(shape);
     shape.style.transform = `scale(${gridScale})`;  
 }
 
 updateGrid();
+
