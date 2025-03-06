@@ -1,0 +1,142 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+}
+.sidebar {
+    width: 150px;
+    background: #ddd;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+}
+.tab {
+    padding: 10px;
+    cursor: pointer;
+    background: #bbb;
+    margin-bottom: 5px;
+    text-align: center;
+}
+.tab:hover {
+    background: #aaa;
+}
+.canvas-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+.controls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+.grid {
+    display: grid;
+    gap: 5px;
+    border: 1px solid black;
+    position: absolute;
+    transform-origin: center;
+}
+.cell {
+    width: 40px;
+    height: 40px;
+    background-color: lightgray;
+    border: 1px solid black;
+}
+.draggable {
+    position: absolute;
+    cursor: grab;
+    width: 50px;
+    height: 50px;
+}
+
+/* Style for the grid container */
+#gridContainer {
+    display: grid;
+    position: relative;
+}
+
+/* Bounding box styles */
+.bounding-box {
+    border: 2px dashed #000;
+    position: absolute;
+    pointer-events: none; /* Bounding box should not capture mouse events */
+}
+
+/* Resize dot styles */
+.resize-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: black;
+    position: absolute;
+    cursor: pointer;
+}
+
+.resize-dot.top-left {
+    top: -5px;
+    left: -5px;
+    cursor: nwse-resize;
+}
+
+.resize-dot.top-right {
+    top: -5px;
+    right: -5px;
+    cursor: nesw-resize;
+}
+
+.resize-dot.bottom-left {
+    bottom: -5px;
+    left: -5px;
+    cursor: nesw-resize;
+}
+
+.resize-dot.bottom-right {
+    bottom: -5px;
+    right: -5px;
+    cursor: nwse-resize;
+}
+
+/* Rotation dot style */
+.rotate-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: red;
+    position: absolute;
+    right: -15px;
+    top: 50%;
+    cursor: pointer;
+}
+
+.red-circle { background: red; border-radius: 50%; }
+.green-circle { background: green; border-radius: 50%; }
+.black-outline { border: 3px solid black; border-radius: 50%; background: transparent; }
+.gray-blob { background: gray; border-radius: 20%; }
+.bounding-box {
+    position: absolute;
+    border: 1px dashed black;
+    pointer-events: none;
+    display: none;
+}
+.resize-handle {
+    width: 10px;
+    height: 10px;
+    background: white;
+    border: 1px solid black;
+    position: absolute;
+}
+.handle-tl { top: -5px; left: -5px; cursor: nwse-resize; }
+.handle-tr { top: -5px; right: -5px; cursor: nesw-resize; }
+.handle-bl { bottom: -5px; left: -5px; cursor: nesw-resize; }
+.handle-br { bottom: -5px; right: -5px; cursor: nwse-resize; }
+.handle-tm { top: -5px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+.handle-bm { bottom: -5px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+.handle-ml { left: -5px; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
+.handle-mr { right: -5px; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
