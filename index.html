@@ -62,29 +62,29 @@
             width: 50px;
             height: 50px;
         }
-        .arrow {
+        .dot {
             position: absolute;
             width: 10px;
             height: 10px;
-            background: transparent;
+            background-color: black;
+            border-radius: 50%;
             cursor: pointer;
         }
 
-        .resize-arrow {
-            top: -10px;
-            left: calc(100% - 10px);
-            border-left: 2px solid black;
-            border-top: 2px solid black;
-            transform: rotate(45deg);
+        .resize-dot {
+            top: -5px;
+            left: calc(100% - 5px);
+            background-color: black;
+            cursor: nwse-resize;
         }
 
-        .pivot-arrow {
-            top: calc(100% + 10px);
-            left: calc(100% - 10px);
-            border-left: 2px solid black;
-            border-top: 2px solid black;
-            transform: rotate(135deg);
+        .rotate-dot {
+            top: -5px;
+            left: -5px;
+            background-color: red;
+            cursor: pointer;
         }
+
 
 
         .red-circle { background: red; border-radius: 50%; }
@@ -189,26 +189,25 @@
                 };
             };
 
-            // Create the right-click arrow to resize
+            // Create the right-click dot for resizing
             element.oncontextmenu = function(event) {
                 event.preventDefault(); // Prevent the default right-click menu
 
-                // Create and show the resize arrow in the top-right corner of the shape
-                const resizeArrow = document.createElement("div");
-                resizeArrow.classList.add("arrow", "resize-arrow");
-                resizeArrow.style.position = "absolute";
-                resizeArrow.style.top = `-10px`;
-                resizeArrow.style.left = `calc(100% - 10px)`;
-                resizeArrow.style.width = "10px";
-                resizeArrow.style.height = "10px";
-                resizeArrow.style.borderLeft = "2px solid black";
-                resizeArrow.style.borderTop = "2px solid black";
-                resizeArrow.style.transform = "rotate(45deg)";
-                resizeArrow.style.cursor = "nwse-resize";
-                element.appendChild(resizeArrow);
+                // Create and show the resize dot in the top-right corner of the shape
+                const resizeDot = document.createElement("div");
+                resizeDot.classList.add("dot", "resize-dot");
+                resizeDot.style.position = "absolute";
+                resizeDot.style.top = `-5px`;
+                resizeDot.style.left = `calc(100% - 5px)`;
+                resizeDot.style.width = "10px";
+                resizeDot.style.height = "10px";
+                resizeDot.style.borderRadius = "50%";
+                resizeDot.style.backgroundColor = "black";
+                resizeDot.style.cursor = "nwse-resize";
+                element.appendChild(resizeDot);
 
-                // Allow resizing with this arrow
-                resizeArrow.onmousedown = function(e) {
+                // Allow resizing with this dot
+                resizeDot.onmousedown = function(e) {
                     e.stopPropagation(); // Prevent the shape's mousemove event from firing
 
                     let startX = e.clientX;
@@ -239,46 +238,37 @@
                     document.onmouseup = function() {
                         document.onmousemove = null;
                         document.onmouseup = null;
-                        element.removeChild(resizeArrow); // Remove the arrow when done resizing
+                        element.removeChild(resizeDot); // Remove the dot when done resizing
                     };
                 };
 
-                // Create and show the pivot toggle arrow
-                const pivotArrow = document.createElement("div");
-                pivotArrow.classList.add("arrow", "pivot-arrow");
-                pivotArrow.style.position = "absolute";
-                pivotArrow.style.top = `calc(100% + 10px)`;
-                pivotArrow.style.left = `calc(100% - 10px)`;
-                pivotArrow.style.width = "10px";
-                pivotArrow.style.height = "10px";
-                pivotArrow.style.borderLeft = "2px solid black";
-                pivotArrow.style.borderTop = "2px solid black";
-                pivotArrow.style.transform = "rotate(135deg)";
-                pivotArrow.style.cursor = "pointer";
-                element.appendChild(pivotArrow);
+                // Create and show the rotation dot
+                const rotateDot = document.createElement("div");
+                rotateDot.classList.add("dot", "rotate-dot");
+                rotateDot.style.position = "absolute";
+                rotateDot.style.top = `-5px`;
+                rotateDot.style.left = `-5px`;
+                rotateDot.style.width = "10px";
+                rotateDot.style.height = "10px";
+                rotateDot.style.borderRadius = "50%";
+                rotateDot.style.backgroundColor = "red";
+                rotateDot.style.cursor = "pointer";
+                element.appendChild(rotateDot);
 
-                // Toggle pivot points when clicking the pivot arrow
-                pivotArrow.onclick = function() {
-                    const currentTransformOrigin = element.style.transformOrigin;
-                    switch (currentTransformOrigin) {
-                        case "bottom left":
-                            element.style.transformOrigin = "top left";
-                            break;
-                        case "top left":
-                            element.style.transformOrigin = "center";
-                            break;
-                        case "center":
-                            element.style.transformOrigin = "bottom left";
-                            break;
-                        default:
-                            element.style.transformOrigin = "bottom left";
-                            break;
+                // Handle rotation with the rotation dot
+                let rotationAngle = 0;
+                rotateDot.onclick = function() {
+                    rotationAngle += 45; // Rotate by 45 degrees each time
+                    if (rotationAngle >= 360) {
+                        rotationAngle = 0; // Reset to 0 after a full rotation
                     }
+                    element.style.transform = `rotate(${rotationAngle}deg)`;
                 };
             };
         }
 
         updateGrid();
+
 
 
     </script>
