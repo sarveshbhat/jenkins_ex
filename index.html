@@ -87,6 +87,7 @@
 
 
 
+
         .red-circle { background: red; border-radius: 50%; }
         .green-circle { background: green; border-radius: 50%; }
         .black-outline { border: 3px solid black; border-radius: 50%; background: transparent; }
@@ -220,25 +221,33 @@
                     // Adjust the shape's pivot to the bottom-left corner
                     element.style.transformOrigin = "bottom left";
 
+                    // Create a preview element for resizing
+                    const preview = element.cloneNode();
+                    preview.style.position = "absolute";
+                    preview.style.left = initialLeft + "px";
+                    preview.style.top = initialTop + "px";
+                    preview.style.opacity = 0.5;  // Slight transparency for the preview
+                    document.body.appendChild(preview);
+
                     document.onmousemove = function(e) {
                         const deltaX = e.clientX - startX;
                         const deltaY = e.clientY - startY;
 
-                        // Adjust the size of the shape while pivoting from the bottom-left corner
-                        element.style.width = Math.max(20, initialWidth + deltaX) + "px";
-                        element.style.height = Math.max(20, initialHeight + deltaY) + "px";
-                        
-                        // Recalculate the position to maintain the bottom-left pivot
-                        const newLeft = initialLeft - deltaX;
-                        const newTop = initialTop + deltaY;
-                        element.style.left = newLeft + "px";
-                        element.style.top = newTop + "px";
+                        // Update the preview size in real-time
+                        preview.style.width = Math.max(20, initialWidth + deltaX) + "px";
+                        preview.style.height = Math.max(20, initialHeight + deltaY) + "px";
                     };
 
                     document.onmouseup = function() {
+                        // Finalize the shape size and remove the preview
+                        element.style.width = preview.offsetWidth + "px";
+                        element.style.height = preview.offsetHeight + "px";
+                        document.body.removeChild(preview);
+
                         document.onmousemove = null;
                         document.onmouseup = null;
-                        element.removeChild(resizeDot); // Remove the dot when done resizing
+
+                        element.removeChild(resizeDot); // Remove the resize dot when done resizing
                     };
                 };
 
@@ -268,8 +277,6 @@
         }
 
         updateGrid();
-
-
 
     </script>
 </body>
