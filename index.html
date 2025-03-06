@@ -10,6 +10,7 @@
             display: flex;
             height: 100vh;
             margin: 0;
+            overflow: hidden;
         }
         .sidebar {
             width: 150px;
@@ -35,6 +36,7 @@
             align-items: center;
             justify-content: center;
             position: relative;
+            overflow: hidden;
         }
         .controls {
             position: absolute;
@@ -45,7 +47,8 @@
             display: grid;
             gap: 5px;
             border: 1px solid black;
-            margin-top: 20px;
+            position: absolute;
+            transform-origin: center;
         }
         .cell {
             width: 40px;
@@ -72,7 +75,7 @@
         <div class="tab" onclick="addShape('black-outline')">Spells</div>
         <div class="tab" onclick="addShape('gray-blob')">Terrain</div>
     </div>
-    <div class="canvas-container">
+    <div class="canvas-container" onwheel="zoomGrid(event)">
         <div class="controls">
             <label for="gridSize">Grid Size:</label>
             <input type="number" id="gridSize" min="1" max="50" value="5">
@@ -82,6 +85,7 @@
     </div>
 
     <script>
+        let gridScale = 1;
         function updateGrid() {
             const size = document.getElementById("gridSize").value;
             const grid = document.getElementById("gridContainer");
@@ -96,14 +100,21 @@
             }
         }
 
+        function zoomGrid(event) {
+            gridScale += event.deltaY > 0 ? -0.1 : 0.1;
+            gridScale = Math.max(0.5, Math.min(gridScale, 2));
+            document.getElementById("gridContainer").style.transform = `scale(${gridScale})`;
+            event.preventDefault();
+        }
+
         function addShape(type) {
             const shape = document.createElement("div");
             shape.classList.add("draggable", type);
             document.body.appendChild(shape);
-            makeDraggable(shape);
+            makeTransformable(shape);
         }
 
-        function makeDraggable(element) {
+        function makeTransformable(element) {
             let offsetX, offsetY, rotation = 0, scale = 1;
             
             element.onmousedown = function(event) {
@@ -122,11 +133,11 @@
             element.onwheel = function(event) {
                 if (event.shiftKey) {
                     rotation += event.deltaY > 0 ? 15 : -15;
-                    element.style.transform = `rotate(${rotation}deg) scale(${scale})`;
                 } else {
                     scale += event.deltaY > 0 ? -0.1 : 0.1;
-                    element.style.transform = `rotate(${rotation}deg) scale(${scale})`;
+                    scale = Math.max(0.5, Math.min(scale, 2));
                 }
+                element.style.transform = `rotate(${rotation}deg) scale(${scale})`;
                 event.preventDefault();
             };
         }
@@ -135,4 +146,3 @@
     </script>
 </body>
 </html>
-
