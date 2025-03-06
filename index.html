@@ -212,15 +212,10 @@
                 resizeDot.onmousedown = function(e) {
                     e.stopPropagation(); // Prevent the shape's mousemove event from firing
 
-                    let startX = e.clientX;
-                    let startY = e.clientY;
                     const initialWidth = element.offsetWidth;
                     const initialHeight = element.offsetHeight;
                     const initialLeft = element.offsetLeft;
                     const initialTop = element.offsetTop;
-
-                    // Adjust the shape's pivot to the bottom-left corner
-                    element.style.transformOrigin = "bottom left";
 
                     // Create a preview element for resizing
                     const preview = element.cloneNode();
@@ -231,8 +226,8 @@
                     document.body.appendChild(preview);
 
                     document.onmousemove = function(e) {
-                        const deltaX = e.clientX - startX;
-                        const deltaY = e.clientY - startY;
+                        const deltaX = e.clientX - initialLeft;
+                        const deltaY = e.clientY - initialTop;
 
                         // Update the preview size in real-time
                         preview.style.width = Math.max(20, initialWidth + deltaX) + "px";
@@ -321,6 +316,7 @@
         }
 
         updateGrid();
+
 
     </script>
 </body>
