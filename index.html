@@ -183,6 +183,7 @@
                 document.onmousemove = function(event) {
                     element.style.left = event.clientX - offsetX + 'px';
                     element.style.top = event.clientY - offsetY + 'px';
+                    updateDotPositions(element); // Update the positions of dots while moving the shape
                 };
                 document.onmouseup = function() {
                     document.onmousemove = null;
@@ -194,12 +195,12 @@
             element.oncontextmenu = function(event) {
                 event.preventDefault(); // Prevent the default right-click menu
 
-                // Create and show the resize dot in the top-right corner of the shape
+                // Create and show the resize dot at the bottom-right corner of the shape
                 const resizeDot = document.createElement("div");
                 resizeDot.classList.add("dot", "resize-dot");
                 resizeDot.style.position = "absolute";
-                resizeDot.style.top = `-5px`;
-                resizeDot.style.left = `calc(100% - 5px)`;
+                resizeDot.style.bottom = `-5px`;
+                resizeDot.style.right = `-5px`;
                 resizeDot.style.width = "10px";
                 resizeDot.style.height = "10px";
                 resizeDot.style.borderRadius = "50%";
@@ -251,12 +252,12 @@
                     };
                 };
 
-                // Create and show the rotation dot
+                // Create and show the rotation dot on the right side of the shape
                 const rotateDot = document.createElement("div");
                 rotateDot.classList.add("dot", "rotate-dot");
                 rotateDot.style.position = "absolute";
-                rotateDot.style.top = `-5px`;
-                rotateDot.style.left = `-5px`;
+                rotateDot.style.top = `50%`;
+                rotateDot.style.right = `-5px`;
                 rotateDot.style.width = "10px";
                 rotateDot.style.height = "10px";
                 rotateDot.style.borderRadius = "50%";
@@ -298,11 +299,28 @@
                         document.onmouseup = null;
                     };
                 };
+
+                // Function to update the positions of the resize and rotate dots while the shape moves
+                function updateDotPositions(element) {
+                    const resizeDot = element.querySelector(".resize-dot");
+                    const rotateDot = element.querySelector(".rotate-dot");
+
+                    if (resizeDot) {
+                        // Update the position of the resize dot at the bottom-right corner
+                        resizeDot.style.bottom = `-5px`;
+                        resizeDot.style.right = `-5px`;
+                    }
+
+                    if (rotateDot) {
+                        // Update the position of the rotate dot on the right side of the shape
+                        rotateDot.style.top = `50%`;
+                        rotateDot.style.right = `-5px`;
+                    }
+                }
             };
         }
 
         updateGrid();
-
 
     </script>
 </body>
